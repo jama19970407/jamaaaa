@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prosto+One&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky jet</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body class="page">
+    
+    <div class="preloader">
+        <div class="preload-container">
+          <img
+            src="images/luckyjet.svg"
+            alt=""
+            style="transform: translateY(-200%) scale(3);"
+          />
+          <img
+            src="images/1win_logo.png"
+            alt=""
+          />
+          <div class="spinner"></div>
+        </div>
+    </div>
+
+    <div class="cv">
+        <img id="ob1" class="obloko" src="images/obl.svg">
+        <img id="ob2" class="obloko2" src="images/obl.svg">
+        
+    </div>
+
+    <div class="winner">
+        <img class="luck" src="images/Lucky.svg">
+        <img class="win" src="images/1win_logo.png">    </div>    <div class="rocket">
+
+        <div id="responseText2" class="text2"></div>
+        <div id="responseText" class="text"></div>
+        <div id="coefficients" class="kif"></div>
+        <div class="pred-txt">
+            <a>NEXT ROUND PREDICTIONS</a>
+        </div>
+          
+        <div class="loader2"></div>
+        <div class="loader">
+            <div class="bar"></div>
+        </div>
+        <div class="visible">
+            <iframe id="melement" src="https://100hp.app/lucky/onewin/" style="pointer-events: none" onload="hideElements()" scrolling="no"></iframe>
+        </div>        <!-- Boy + Fire sinxron uchish wrapper -->
+        <div id="flyWrapper" class="fly-wrapper">
+            <img id="sup" class="rocket_boy" src="./images/boy.gif">
+            <img id="cup" class="rocket_fire" src="./images/fire.gif">
+        </div>
+
+        <!-- Win banner -->
+        <div id="winBanner" class="win-banner" style="display:none;">
+            <div class="win-banner-top">
+                <span class="win-banner-label">✈️ Siz oldingiz!</span>
+                <span id="winBannerAmount" class="win-banner-amount">+50,000 UZS</span>
+            </div>
+            <div class="win-banner-coef-row">
+                <div class="win-banner-coef-box">
+                    <span id="winBannerCoef" class="win-banner-coef">x2.45</span>
+                </div>
+                <span class="win-banner-win-txt">Sizning g'alabangiz 🎉</span>
+            </div>
+            <div class="win-banner-next">
+                <span>⬇ Keyingi raund prognozi:</span>
+            </div>
+        </div>        <!-- Results -->
+        <div id="predictionsContainer" class="predictions-container"></div>
+
+        <!-- Input + tugma — eng pastda -->
+        <div class="bet-container">
+            <input type="number" id="lastCoef" class="bet-input" placeholder="Oxirgi koeffitsientni kiriting..." min="1.01" step="0.01">
+            <button id="calculateBtn" class="calculate-btn">PROGNOZ OLISH</button>
+        </div>
+
+        <a href="https://1warlo.top/casino/list?open=register&p=xrjt" target="_blank">
+            <button class="button2">GO TO GAME</button>
+        </a>
+
+    </div>
+        
+    <script src="script.js"></script>
+   
+    <div id="result" class="rand"></div>
+
+</body>
+</html>
