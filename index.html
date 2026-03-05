@@ -528,36 +528,71 @@ function renderHistory() {
 }
 
 // ---- COEFFICIENT GENERATOR ----
+// Real Lucky Jet taqsimoti (yangilangan, realistik):
+//  ~35% → 1.01x – 1.10x  (eng ko'p portlash zonasi)
+//  ~20% → 1.10x – 1.50x
+//  ~18% → 1.50x – 2.00x
+//  ~14% → 2.00x – 5.00x
+//  ~8%  → 5.00x – 10.0x
+//  ~4%  → 10.0x – 50.0x
+//  ~1%  → 50.0x – 200x
 function genCrashCoef() {
     const r = Math.random() * 100;
-    if (r < 55) return +(Math.random() * (2.0 - 1.01) + 1.01).toFixed(2);
-    if (r < 80) return +(Math.random() * (5.0 - 2.0) + 2.0).toFixed(2);
-    if (r < 93) return +(Math.random() * (10.0 - 5.0) + 5.0).toFixed(2);
-    return +(Math.random() * (50.0 - 10.0) + 10.0).toFixed(2);
+    if (r < 35) return +(Math.random() * (1.10 - 1.01) + 1.01).toFixed(2);
+    if (r < 55) return +(Math.random() * (1.50 - 1.10) + 1.10).toFixed(2);
+    if (r < 73) return +(Math.random() * (2.00 - 1.50) + 1.50).toFixed(2);
+    if (r < 87) return +(Math.random() * (5.00 - 2.00) + 2.00).toFixed(2);
+    if (r < 95) return +(Math.random() * (10.0 - 5.00) + 5.00).toFixed(2);
+    if (r < 99) return +(Math.random() * (50.0 - 10.0) + 10.0).toFixed(2);
+    return       +(Math.random() * (200.0 - 50.0) + 50.0).toFixed(2);
 }
 function genNext(last) {
     last = parseFloat(last);
     const r = Math.random() * 100;
-    if (last >= 10) {
-        if (r < 75) return (Math.random()*(2.0-1.01)+1.01).toFixed(2);
-        if (r < 92) return (Math.random()*(5.0-2.0)+2.0).toFixed(2);
-        if (r < 98) return (Math.random()*(10.0-5.0)+5.0).toFixed(2);
+    // Katta koefdan keyin aksariyat past tushadi (ketma-ket katta bo'lmaydi)
+    if (last >= 50) {
+        // 50x+ dan keyin ~ 70% ehtimol eng past zonaga tushadi
+        if (r < 70) return (Math.random()*(1.10-1.01)+1.01).toFixed(2);
+        if (r < 85) return (Math.random()*(1.50-1.10)+1.10).toFixed(2);
+        if (r < 93) return (Math.random()*(2.00-1.50)+1.50).toFixed(2);
+        if (r < 97) return (Math.random()*(5.00-2.00)+2.00).toFixed(2);
+        if (r < 99) return (Math.random()*(10.0-5.00)+5.00).toFixed(2);
+        return (Math.random()*(50.0-10.0)+10.0).toFixed(2);
+    } else if (last >= 10) {
+        // 10x–50x dan keyin ~ 55% past
+        if (r < 55) return (Math.random()*(1.10-1.01)+1.01).toFixed(2);
+        if (r < 72) return (Math.random()*(1.50-1.10)+1.10).toFixed(2);
+        if (r < 84) return (Math.random()*(2.00-1.50)+1.50).toFixed(2);
+        if (r < 93) return (Math.random()*(5.00-2.00)+2.00).toFixed(2);
+        if (r < 98) return (Math.random()*(10.0-5.00)+5.00).toFixed(2);
         return (Math.random()*(50.0-10.0)+10.0).toFixed(2);
     } else if (last >= 5) {
-        if (r < 68) return (Math.random()*(2.0-1.01)+1.01).toFixed(2);
-        if (r < 88) return (Math.random()*(5.0-2.0)+2.0).toFixed(2);
-        if (r < 97) return (Math.random()*(10.0-5.0)+5.0).toFixed(2);
-        return (Math.random()*(50.0-10.0)+10.0).toFixed(2);
+        // 5x–10x dan keyin ~ 50% past
+        if (r < 50) return (Math.random()*(1.10-1.01)+1.01).toFixed(2);
+        if (r < 68) return (Math.random()*(1.50-1.10)+1.10).toFixed(2);
+        if (r < 80) return (Math.random()*(2.00-1.50)+1.50).toFixed(2);
+        if (r < 92) return (Math.random()*(5.00-2.00)+2.00).toFixed(2);
+        if (r < 97) return (Math.random()*(10.0-5.00)+5.00).toFixed(2);
+        if (r < 99.5) return (Math.random()*(50.0-10.0)+10.0).toFixed(2);
+        return (Math.random()*(200.0-50.0)+50.0).toFixed(2);
     } else if (last >= 2) {
-        if (r < 58) return (Math.random()*(2.0-1.01)+1.01).toFixed(2);
-        if (r < 82) return (Math.random()*(5.0-2.0)+2.0).toFixed(2);
-        if (r < 93) return (Math.random()*(10.0-5.0)+5.0).toFixed(2);
-        return (Math.random()*(50.0-10.0)+10.0).toFixed(2);
+        // 2x–5x dan keyin oddiy taqsimot
+        if (r < 38) return (Math.random()*(1.10-1.01)+1.01).toFixed(2);
+        if (r < 57) return (Math.random()*(1.50-1.10)+1.10).toFixed(2);
+        if (r < 74) return (Math.random()*(2.00-1.50)+1.50).toFixed(2);
+        if (r < 88) return (Math.random()*(5.00-2.00)+2.00).toFixed(2);
+        if (r < 95) return (Math.random()*(10.0-5.00)+5.00).toFixed(2);
+        if (r < 99) return (Math.random()*(50.0-10.0)+10.0).toFixed(2);
+        return (Math.random()*(200.0-50.0)+50.0).toFixed(2);
     } else {
-        if (r < 48) return (Math.random()*(2.0-1.01)+1.01).toFixed(2);
-        if (r < 76) return (Math.random()*(5.0-2.0)+2.0).toFixed(2);
-        if (r < 92) return (Math.random()*(10.0-5.0)+5.0).toFixed(2);
-        return (Math.random()*(50.0-10.0)+10.0).toFixed(2);
+        // 1.01x–2x dan keyin standart taqsimot
+        if (r < 35) return (Math.random()*(1.10-1.01)+1.01).toFixed(2);
+        if (r < 55) return (Math.random()*(1.50-1.10)+1.10).toFixed(2);
+        if (r < 73) return (Math.random()*(2.00-1.50)+1.50).toFixed(2);
+        if (r < 87) return (Math.random()*(5.00-2.00)+2.00).toFixed(2);
+        if (r < 95) return (Math.random()*(10.0-5.00)+5.00).toFixed(2);
+        if (r < 99) return (Math.random()*(50.0-10.0)+10.0).toFixed(2);
+        return (Math.random()*(200.0-50.0)+50.0).toFixed(2);
     }
 }
 
