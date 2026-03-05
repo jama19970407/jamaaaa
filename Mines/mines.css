@@ -170,18 +170,33 @@ html {
   background: radial-gradient(50% 50% at 50% 50%, #151b2e 0, rgba(21, 27, 46, 0) 100%);
 }
 
+/* Main game container - full screen layout */
+.flex.justify-center.align-middle {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 100vh;
+  width: 100%;
+  padding-bottom: 20px;
+  background: none;
+}
+
 .footer {
   width: 100%;
-    height: auto;
-    top: 65% !important;
-    position: absolute;
-    z-index: -5;
+  height: auto;
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
 }
 
 .cells-board-wrapper {
-  margin-bottom: 40px;
-  margin-top: 30%;
+  margin-bottom: 20px;
+  margin-top: 10px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .cells-board {
@@ -193,10 +208,12 @@ html {
   border-radius: 25px;
   box-shadow: 0 -2px 20px rgba(42, 49, 69, .4), 0 4px 54px rgba(42, 49, 69, .2);
   display: grid;
-  grid-template-columns: repeat(5, 50px);
-  grid-template-rows: repeat(5, 50px);
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
   overflow: hidden;
   padding: 10px;
+  width: min(300px, 90vw);
+  height: min(300px, 90vw);
 }
 
 .cells-board .cell {
@@ -872,14 +889,22 @@ body.fade-in {
 
 /* Status bar */
 .status-bar{
-  max-height:137px;
-  min-height:0px;
-  max-width:128px;
+  max-height: none;
+  min-height: 0px;
+  max-width: 100%;
+  width: 90%;
   position: relative;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index:4;
-  margin-top:10%;
+  left: auto;
+  transform: none;
+  z-index: 4;
+  margin: 10px auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background: #151b2e;
+  border-radius: 1rem;
+  padding: .5rem 1rem;
  }
  
  /* Play button */
