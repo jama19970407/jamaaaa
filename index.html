@@ -1,875 +1,632 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucky Jet — 1WIN</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>💣 Mines Game</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            background: #0a0d1a;
-            min-height: 100vh;
-            font-family: 'Montserrat', sans-serif;
-            color: #fff;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+    body {
+      background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+      overflow: hidden;
+    }
 
-        /* ========= PRELOADER ========= */
-        #preloader {
-            position: fixed;
-            inset: 0;
-            background: #0a0d1a;
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.8s ease;
-        }
-        #preloader.hide { opacity: 0; pointer-events: none; }
-        .pre-logo { width: 160px; margin-bottom: 18px; filter: drop-shadow(0 0 18px #a259ff); }
-        .pre-1win { width: 100px; margin-bottom: 28px; }
-        .pre-bar-wrap {
-            width: 220px; height: 5px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px; overflow: hidden;
-        }
-        .pre-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #6b30f9, #a259ff);
-            border-radius: 10px;
-            animation: preBarAnim 1.8s ease-in-out forwards;
-        }
-        @keyframes preBarAnim { 0%{width:0} 100%{width:100%} }
+    /* Stars background */
+    .stars {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 2s infinite alternate;
+    }
 
-        /* ========= TOP HEADER ========= */
-        .top-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 400px;
-            padding: 14px 16px 8px;
-        }
-        .logo-group { display: flex; align-items: center; gap: 10px; }
-        .logo-group img { height: 36px; }
-        .lucky-logo { height: 28px !important; }
-        .live-badge {
-            background: #e8003d;
-            color: #fff;
-            font-size: 11px;
-            font-weight: 800;
-            padding: 3px 9px;
-            border-radius: 20px;
-            letter-spacing: 1px;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0%,100%{box-shadow:0 0 0 0 rgba(232,0,61,0.5)}
-            50%{box-shadow:0 0 0 6px rgba(232,0,61,0)}
-        }
+    @keyframes twinkle {
+      from { opacity: 0.2; }
+      to   { opacity: 1; }
+    }
 
-        /* ========= GAME ARENA ========= */
-        .arena {
-            position: relative;
-            width: 100%;
-            max-width: 400px;
-            height: 280px;
-            background: linear-gradient(180deg, #0d1130 0%, #121828 100%);
-            border-radius: 20px;
-            overflow: hidden;
-            margin: 0 12px;
-            border: 1px solid rgba(107,48,249,0.3);
-            box-shadow: 0 0 40px rgba(107,48,249,0.15);
-        }
+    .container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 30px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 20px;
+    }
 
-        /* Stars */
-        .stars {
-            position: absolute; inset: 0;
-            background-image:
-                radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1px),
-                radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px);
-            background-size: 80px 80px, 40px 40px;
-            background-position: 0 0, 20px 20px;
-            opacity: 0.15;
-        }
+    /* LEFT PANEL */
+    .left-panel {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 24px;
+      width: 220px;
+      backdrop-filter: blur(10px);
+    }
 
-        /* CLOUDS */
-        .cloud-layer {
-            position: absolute;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-        }
-        .cloud {
-            position: absolute;
-            opacity: 0.55;
-        }
-        .cloud-1 {
-            width: 200px;
-            top: 60%;
-            animation: cloudMove1 8s linear infinite;
-        }
-        .cloud-2 {
-            width: 140px;
-            top: 30%;
-            animation: cloudMove2 12s linear infinite;
-            opacity: 0.3;
-        }
-        .cloud-3 {
-            width: 170px;
-            top: 75%;
-            animation: cloudMove3 10s linear infinite;
-            opacity: 0.4;
-        }
-        @keyframes cloudMove1 {
-            from { left: 110%; }
-            to   { left: -60%; }
-        }
-        @keyframes cloudMove2 {
-            from { left: 130%; }
-            to   { left: -50%; }
-        }
-        @keyframes cloudMove3 {
-            from { left: 120%; }
-            to   { left: -55%; }
-        }
+    .left-panel h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #f0c040;
+      margin-bottom: 20px;
+      text-align: center;
+      letter-spacing: 2px;
+    }
 
-        /* TRAJECTORY LINE */
-        .traj-svg {
-            position: absolute;
-            bottom: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-        }
-        .traj-path {
-            fill: none;
-            stroke: rgba(162,89,255,0.5);
-            stroke-width: 2;
-            stroke-dasharray: 600;
-            stroke-dashoffset: 600;
-            transition: stroke-dashoffset 0.1s linear;
-        }
+    .label {
+      font-size: 12px;
+      color: #aaa;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
-        /* PLANE */
-        #plane {
-            position: absolute;
-            width: 90px;
-            bottom: 30px;
-            left: 20px;
-            transform-origin: center center;
-            transition: left 0.1s linear, bottom 0.1s linear;
-            filter: drop-shadow(0 0 8px rgba(162,89,255,0.6));
-            z-index: 5;
-        }
+    .score-display {
+      background: rgba(0,0,0,0.4);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 22px;
+      font-weight: 700;
+      color: #f0c040;
+      text-align: center;
+      margin-bottom: 16px;
+      border: 1px solid rgba(240,192,64,0.3);
+    }    .mines-selector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      background: rgba(0,0,0,0.4);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }.mine-pick-btn {
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,255,255,0.15);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mine-pick-btn:hover { background: rgba(255,100,100,0.25); border-color: #ff6b6b; }
+    .mine-pick-btn.active-mine {
+      background: rgba(255,80,80,0.3);
+      border-color: #ff4444;
+      color: #ff6b6b;
+      box-shadow: 0 0 12px rgba(255,68,68,0.4);
+    }
 
-        /* EXPLOSION */
-        #explosion {
-            position: absolute;
-            width: 110px;
-            display: none;
-            z-index: 10;
-        }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
 
-        /* COEF DISPLAY */
-        .coef-display {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -52%);
-            text-align: center;
-            z-index: 8;
-            pointer-events: none;
-        }
-        .coef-value {
-            font-size: 62px;
-            font-weight: 900;
-            letter-spacing: 2px;
-            line-height: 1;
-            color: #fff;
-            text-shadow: 0 0 30px #a259ff, 0 0 60px rgba(162,89,255,0.4);
-            transition: color 0.3s;
-        }
-        .coef-value.crashed { color: #e8003d; text-shadow: 0 0 30px #e8003d, 0 0 60px rgba(232,0,61,0.4); }
-        .coef-value.flying  { color: #a8ff5e; text-shadow: 0 0 30px #a8ff5e, 0 0 60px rgba(168,255,94,0.3); }
-        .coef-label {
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            color: rgba(255,255,255,0.5);
-            text-transform: uppercase;
-            margin-top: 4px;
-        }
+    .btn-play {
+      background: linear-gradient(135deg, #43e97b, #38f9d7);
+      color: #111;
+    }
+    .btn-play:hover { transform: scale(1.03); box-shadow: 0 0 20px #43e97b88; }
 
-        /* PHASE LABELS */
-        .phase-label {
-            position: absolute;
-            top: 12px; left: 50%;
-            transform: translateX(-50%);
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            padding: 4px 16px;
-            border-radius: 20px;
-            z-index: 9;
-        }
-        .phase-label.betting {
-            background: rgba(255,165,0,0.15);
-            color: #ffa500;
-            border: 1px solid rgba(255,165,0,0.4);
-        }
-        .phase-label.flying {
-            background: rgba(168,255,94,0.1);
-            color: #a8ff5e;
-            border: 1px solid rgba(168,255,94,0.35);
-        }
-        .phase-label.crashed {
-            background: rgba(232,0,61,0.15);
-            color: #e8003d;
-            border: 1px solid rgba(232,0,61,0.4);
-        }
+    .btn-cashout {
+      background: linear-gradient(135deg, #f7971e, #ffd200);
+      color: #111;
+      display: none;
+    }
+    .btn-cashout:hover { transform: scale(1.03); box-shadow: 0 0 20px #ffd20088; }
 
-        /* PROGRESS BAR (betting countdown) */
-        .bet-timer-wrap {
-            position: absolute;
-            bottom: 12px; left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-        }
-        .bet-timer-bar {
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .bet-timer-fill {
-            height: 100%;
-            border-radius: 4px;
-            background: linear-gradient(90deg, #ffa500, #ff6a00);
-            transition: width 0.1s linear;
-        }
-        .bet-timer-txt {
-            font-size: 11px;
-            color: rgba(255,255,255,0.5);
-            margin-top: 4px;
-            text-align: center;
-        }
+    .multiplier {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 900;
+      color: #43e97b;
+      margin: 10px 0;
+      text-shadow: 0 0 20px #43e97b;
+      min-height: 40px;
+    }
 
-        /* ========= HISTORY PILLS ========= */
-        .history-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            width: 100%;
-            max-width: 400px;
-            padding: 10px 16px;
-        }
-        .hist-pill {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-            animation: popIn 0.3s ease;
-        }
-        @keyframes popIn { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
-        .hist-blue   { background: #1e3a8a; color: #93c5fd; }
-        .hist-purple { background: #4c1d95; color: #c4b5fd; }
-        .hist-orange { background: #7c2d12; color: #fdba74; }
-        .hist-red    { background: #7f1d1d; color: #fca5a5; }
-        .hist-green  { background: #14532d; color: #86efac; }
+    .status-msg {
+      text-align: center;
+      font-size: 13px;
+      color: #aaa;
+      min-height: 20px;
+    }
 
-        /* ========= SIGNAL CARD ========= */
-        .signal-card {
-            width: 100%;
-            max-width: 400px;
-            margin: 6px 12px;
-            background: linear-gradient(135deg, #131629 0%, #1a1d35 100%);
-            border: 1px solid rgba(107,48,249,0.4);
-            border-radius: 16px;
-            padding: 14px 18px;
-        }
-        .signal-title {
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            color: rgba(255,255,255,0.4);
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-        .signal-val {
-            font-size: 42px;
-            font-weight: 900;
-            color: #a259ff;
-            text-shadow: 0 0 20px rgba(162,89,255,0.5);
-            letter-spacing: 2px;
-        }
-        .signal-sub {
-            font-size: 12px;
-            color: rgba(255,255,255,0.4);
-            margin-top: 2px;
-        }
+    /* GRID */
+    .grid-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
 
-        /* ========= INPUT + BUTTON ========= */
-        .input-section {
-            width: 100%;
-            max-width: 400px;
-            padding: 4px 16px 8px;
-        }        .input-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            width: 100%;
-        }
-        .bet-input {
-            flex: 1;
-            height: 48px;
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(107,48,249,0.4);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 15px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            padding: 0 14px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        .bet-input:focus { border-color: #a259ff; box-shadow: 0 0 12px rgba(162,89,255,0.3); }
-        .bet-input::placeholder { color: rgba(255,255,255,0.3); font-weight: 400; }        .calc-btn {
-            height: 48px;
-            padding: 0 18px;
-            background: linear-gradient(135deg, #6b30f9 0%, #a259ff 100%);
-            border: none;
-            border-radius: 12px;
-            color: #fff;
-            font-size: 15px;
-            font-weight: 800;
-            font-family: 'Montserrat', sans-serif;
-            cursor: pointer;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            box-shadow: 0 4px 20px rgba(107,48,249,0.4);
-            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
-            width: 100%;
-        }
-        .calc-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(107,48,249,0.6); }
-        .calc-btn:active:not(:disabled) { transform: translateY(0); }
-        .calc-btn:disabled { cursor: not-allowed; }
+    .title {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: #f0c040;
+      text-shadow: 0 0 30px #f0c04088;
+      text-align: center;
+    }
 
-        /* ========= PREDICTION RESULT ========= */
-        .pred-result {
-            background: linear-gradient(135deg, rgba(107,48,249,0.15), rgba(162,89,255,0.08));
-            border: 2px solid rgba(162,89,255,0.3);
-            border-radius: 14px;
-            padding: 14px 18px;
-            display: none;
-            align-items: center;
-            justify-content: space-between;
-            animation: slideUp 0.4s ease;
-        }
-        .pred-result.show { display: flex; }
-        @keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-        .pred-left { font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 600; }
-        .pred-coef {
-            font-size: 32px;
-            font-weight: 900;
-            color: #a259ff;
-            text-shadow: 0 0 15px rgba(162,89,255,0.6);
-        }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      background: rgba(255,255,255,0.03);
+      padding: 20px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
 
-        /* ========= GO TO GAME BTN ========= */
-        .go-btn {
-            display: block;
-            width: 100%;
-            height: 52px;
-            background: linear-gradient(135deg, #6b30f9, #a259ff);
-            border: none;
-            border-radius: 14px;
-            color: #fff;
-            font-size: 17px;
-            font-weight: 800;
-            font-family: 'Montserrat', sans-serif;
-            letter-spacing: 1px;
-            cursor: pointer;
-            box-shadow: 0 6px 30px rgba(107,48,249,0.5);
-            margin-top: 10px;
-            transition: transform 0.2s;
-        }
-        .go-btn:hover { transform: scale(1.02); }
+    .cell {
+      width: 80px;
+      height: 80px;
+      border-radius: 14px;
+      background: linear-gradient(145deg, #2a3f6f, #1a2a4f);
+      border: 2px solid rgba(100,160,255,0.25);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      transition: all 0.15s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+      position: relative;
+      overflow: hidden;
+    }
 
-        /* ========= WIN FLASH ========= */
-        #winFlash {
-            position: fixed;
-            inset: 0;
-            background: rgba(168,255,94,0.08);
-            pointer-events: none;
-            z-index: 100;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        #winFlash.show { opacity: 1; }
+    .cell::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 40%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.08), transparent);
+      border-radius: 12px 12px 0 0;
+    }
 
-        /* scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #6b30f9; border-radius: 4px; }
-    </style>
+    .cell:hover:not(.revealed):not(.disabled) {
+      background: linear-gradient(145deg, #3a5080, #2a3a60);
+      border-color: rgba(100,180,255,0.6);
+      transform: scale(1.08) translateY(-3px);
+      box-shadow: 0 8px 25px rgba(50,120,255,0.4);
+    }
+
+    .cell.safe {
+      background: linear-gradient(145deg, #1a4a2a, #0f3a1f);
+      border-color: #43e97b;
+      box-shadow: 0 0 20px rgba(67,233,123,0.4);
+      cursor: default;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .cell.mine {
+      background: linear-gradient(145deg, #5a1a1a, #3a0f0f);
+      border-color: #ff4444;
+      box-shadow: 0 0 20px rgba(255,68,68,0.5);
+      cursor: default;
+      animation: shake 0.4s ease;
+    }
+
+    .cell.disabled {
+      cursor: default;
+      opacity: 0.7;
+    }
+
+    @keyframes popIn {
+      0%   { transform: scale(0.8); }
+      70%  { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-6px); }
+      40%      { transform: translateX(6px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(4px); }
+    }
+
+    /* STATS */
+    .stats-row {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .stat-box {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 10px 20px;
+      text-align: center;
+    }
+    .stat-box .val { font-size: 20px; font-weight: 700; color: #f0c040; }
+    .stat-box .lbl { font-size: 11px; color: #888; }
+
+    /* WIN/LOSE overlay */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .overlay.show { display: flex; }
+
+    .popup {
+      background: linear-gradient(135deg, #1a2a4a, #0f1a30);
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 24px;
+      padding: 40px;
+      text-align: center;
+      max-width: 360px;
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .popup .emoji { font-size: 64px; margin-bottom: 16px; }
+    .popup h2 { font-size: 28px; font-weight: 900; margin-bottom: 8px; }
+    .popup p { color: #aaa; margin-bottom: 24px; font-size: 15px; }
+    .popup .big-score { font-size: 36px; font-weight: 900; color: #f0c040; margin-bottom: 20px; }
+
+    .confetti-piece {
+      position: fixed;
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      animation: fall 2s linear forwards;
+      z-index: 200;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    @media (max-width: 600px) {
+      .cell { width: 55px; height: 55px; font-size: 22px; }
+      .container { gap: 15px; }
+      .left-panel { width: 100%; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- PRELOADER -->
-<div id="preloader">
-    <img class="pre-logo" src="images/luckyjet.svg" alt="Lucky Jet">
-    <img class="pre-1win" src="images/1win_logo.png" alt="1WIN">
-    <div class="pre-bar-wrap"><div class="pre-bar"></div></div>
-</div>
+<div class="stars" id="stars"></div>
 
-<div id="winFlash"></div>
+<div class="container">
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <h2>💣 MINES</h2>
 
-<!-- TOP HEADER -->
-<div class="top-header">
-    <div class="logo-group">
-        <img src="images/1win_logo.png" alt="1WIN" style="height:32px">
-        <img class="lucky-logo" src="images/Lucky.svg" alt="Lucky Jet">
-    </div>
-    <span class="live-badge">● LIVE</span>
-</div>
-
-<!-- HISTORY PILLS -->
-<div class="history-row" id="historyRow"></div>
-
-<!-- GAME ARENA -->
-<div class="arena" id="arena">
-    <div class="stars"></div>
-
-    <!-- CLOUDS -->
-    <div class="cloud-layer">
-        <img class="cloud cloud-1" src="images/obl.svg" alt="">
-        <img class="cloud cloud-2" src="images/obl.svg" alt="" style="animation-delay:-4s">
-        <img class="cloud cloud-3" src="images/obl.svg" alt="" style="animation-delay:-2s">
+    <div class="label">Ball</div>
+    <div class="score-display" id="scoreDisplay">1000</div>    <div class="label">Minalar soni</div>
+    <div class="mines-selector" style="justify-content:center; gap:8px; flex-wrap:wrap; padding:10px;">      <button onclick="selectMines(1)" id="mineBtn1" class="mine-pick-btn active-mine">1</button>
+      <button onclick="selectMines(3)" id="mineBtn3" class="mine-pick-btn">3</button>
+      <button onclick="selectMines(5)" id="mineBtn5" class="mine-pick-btn">5</button>
+      <button onclick="selectMines(7)" id="mineBtn7" class="mine-pick-btn">7</button>
     </div>
 
-    <!-- TRAJECTORY -->
-    <svg class="traj-svg" viewBox="0 0 400 280" preserveAspectRatio="none">
-        <path id="trajPath" class="traj-path" d="M 20 250 Q 200 200 380 30"/>
-    </svg>
+    <div class="multiplier" id="multiplierDisplay"></div>
 
-    <!-- PLANE -->
-    <img id="plane" src="images/boy.gif" alt="plane">
+    <button class="btn btn-play" id="playBtn" onclick="startGame()">▶ BOSHLASH</button>
+    <button class="btn btn-cashout" id="cashoutBtn" onclick="cashOut()">💰 OLISH</button>
 
-    <!-- EXPLOSION -->
-    <img id="explosion" src="images/loads.svg" alt="boom">
+    <div class="status-msg" id="statusMsg">Minalar sonini tanlang va boshlang!</div>
+  </div>
 
-    <!-- COEF -->
-    <div class="coef-display">
-        <div class="coef-value" id="coefDisplay">0.00x</div>
-        <div class="coef-label" id="coefLabel">uchmoqda...</div>
+  <!-- GRID -->
+  <div class="grid-wrapper">
+    <div class="title">⭐ CAVEMINES</div>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="val" id="safeStat">0</div>
+        <div class="lbl">Ochilgan</div>
+      </div>
+      <div class="stat-box">
+        <div class="val" id="mineStat" style="color:#ff6b6b">3</div>
+        <div class="lbl">Mina</div>
+      </div>
+      <div class="stat-box">
+        <div class="val" id="leftStat">25</div>
+        <div class="lbl">Qolgan</div>
+      </div>
+    </div>    <div class="grid" id="grid"></div>
+
+    <!-- Keyingi koeffitsientlar paneli -->
+    <div id="nextMultsPanel" style="display:none; gap:8px; align-items:center; background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:10px 16px; flex-wrap:wrap; justify-content:center;">
+      <span style="font-size:11px;color:#aaa;letter-spacing:1px;">KEYINGI QADAM:</span>
+      <div class="nm-cell" style="background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.4);color:#f0c040;font-weight:700;font-size:14px;padding:5px 12px;border-radius:8px;"></div>
+      <div class="nm-cell" style="background:rgba(240,192,64,0.1);border:1px solid rgba(240,192,64,0.25);color:#f0c040;font-weight:700;font-size:14px;padding:5px 12px;border-radius:8px;opacity:0.8"></div>
+      <div class="nm-cell" style="background:rgba(240,192,64,0.07);border:1px solid rgba(240,192,64,0.15);color:#f0c040;font-weight:700;font-size:14px;padding:5px 12px;border-radius:8px;opacity:0.6"></div>
+      <div class="nm-cell" style="background:rgba(240,192,64,0.04);border:1px solid rgba(240,192,64,0.1);color:#f0c040;font-weight:700;font-size:14px;padding:5px 12px;border-radius:8px;opacity:0.4"></div>
     </div>
-
-    <!-- PHASE LABEL -->
-    <div class="phase-label betting" id="phaseLabel">🎰 Stavka qo'ying</div>
-
-    <!-- BET TIMER -->
-    <div class="bet-timer-wrap" id="betTimerWrap">
-        <div class="bet-timer-bar">
-            <div class="bet-timer-fill" id="betTimerFill" style="width:100%"></div>
-        </div>
-        <div class="bet-timer-txt" id="betTimerTxt">Raund boshlanishiga: 3.0s</div>
-    </div>
+  </div>
 </div>
 
-<!-- SIGNAL CARD -->
-<div class="signal-card">
-    <div class="signal-title">📡 Keyingi raund signali</div>
-    <div class="signal-val" id="signalVal">—</div>
-    <div class="signal-sub" id="signalSub">Hisoblash uchun stavkani kiriting</div>
-</div>
-
-<!-- INPUT -->
-<div class="input-section">
-    <div class="input-row" id="inputRow">
-        <button class="calc-btn" id="calcBtn" style="width:100%;font-size:16px;letter-spacing:1px;">📡 SIGNAL OLISH</button>
-    </div>    <a href="https://1warlo.top/casino/list?open=register&p=xrjt" target="_blank" style="text-decoration:none">
-        <button class="go-btn">✈️ O'YINGA KIRISH</button>
-    </a>
+<!-- WIN/LOSE OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="popup" id="popup">
+    <div class="emoji" id="popupEmoji">🎉</div>
+    <h2 id="popupTitle">G'ALABA!</h2>
+    <p id="popupMsg">Tabriklaymiz!</p>
+    <div class="big-score" id="popupScore">+500</div>
+    <button class="btn btn-play" onclick="closeOverlay()" style="margin:0">🔄 QAYTA O'YNASH</button>
+  </div>
 </div>
 
 <script>
-// ============================================================
-//  LUCKY JET — FULL GAME SIMULATION
-//  Tsikl: 3s betting → 6s uchish (0.00x → tasodifiy) → crash
-// ============================================================
+  // Stars
+  const starsEl = document.getElementById('stars');
+  for(let i = 0; i < 120; i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 3;
+    s.style.cssText = `width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${1+Math.random()*3}s`;
+    starsEl.appendChild(s);
+  }
+  // Game State
+  let score = 1000;
+  let mineCount = 1;
+  let mines = [];
+  let revealed = [];
+  let gameActive = false;
+  let safeClicks = 0;
+  const GRID_SIZE = 25;
+  // Multiplier table — 1win CaveMines real koeffitsientlari (rasmdan olindi)
+  const MULT_TABLE = {
+    1:  [1.00, 1.04, 1.09, 1.14, 1.20, 1.26, 1.33, 1.40, 1.48, 1.57, 1.67, 1.78, 1.89, 2.02, 2.17, 2.34, 2.53, 2.76, 3.03, 3.36, 3.77, 4.29, 4.99, 5.99, 7.49],
+    2:  [1.00, 1.06, 1.14, 1.22, 1.32, 1.43, 1.56, 1.71, 1.89, 2.09, 2.33, 2.62, 2.97, 3.39, 3.92, 4.58, 5.45, 6.59, 8.14, 10.3, 13.5, 18.4, 26.6, 43.2],
+    3:  [1.00, 0.97, 1.02, 1.06, 1.11, 1.17, 1.22, 1.29, 1.36, 1.44, 1.53, 1.63, 1.75, 1.89, 2.04, 2.22, 2.44, 2.70, 3.03, 3.44, 3.97, 4.70, 5.74, 7.35],
+    5:  [1.00, 1.17, 1.40, 1.70, 2.11, 2.67, 3.47, 4.62, 6.36, 9.13, 13.8, 22.1, 38.0, 71.4],
+    7:  [1.00, 1.30, 1.84, 2.64, 3.88, 5.82, 8.96, 14.1, 23.0, 38.8, 68.5],
+  };
 
-// ---- HISTORY ----
-let historyArr = [];
-function addHistory(coef) {
-    historyArr.unshift(parseFloat(coef));
-    if (historyArr.length > 12) historyArr.pop();
-    renderHistory();
-}
-function pillClass(v) {
-    if (v < 1.5)  return 'hist-red';
-    if (v < 2.0)  return 'hist-blue';
-    if (v < 5.0)  return 'hist-purple';
-    if (v < 10.0) return 'hist-orange';
-    return 'hist-green';
-}
-function renderHistory() {
-    const row = document.getElementById('historyRow');
-    row.innerHTML = historyArr.map(v =>
-        `<span class="hist-pill ${pillClass(v)}">${v.toFixed(2)}x</span>`
-    ).join('');
-}
-
-// ---- COEFFICIENT GENERATOR ----
-// Real Lucky Jet taqsimoti (yangilangan, realistik):
-//  ~35% → 1.01x – 1.10x  (eng ko'p portlash zonasi)
-//  ~20% → 1.10x – 1.50x
-//  ~18% → 1.50x – 2.00x
-//  ~14% → 2.00x – 5.00x
-//  ~8%  → 5.00x – 10.0x
-//  ~4%  → 10.0x – 50.0x
-//  ~1%  → 50.0x – 200x
-function genCrashCoef() {
-    const r = Math.random() * 100;
-    if (r < 35) return +(Math.random() * (1.10 - 1.01) + 1.01).toFixed(2);
-    if (r < 55) return +(Math.random() * (1.50 - 1.10) + 1.10).toFixed(2);
-    if (r < 73) return +(Math.random() * (2.00 - 1.50) + 1.50).toFixed(2);
-    if (r < 87) return +(Math.random() * (5.00 - 2.00) + 2.00).toFixed(2);
-    if (r < 95) return +(Math.random() * (10.0 - 5.00) + 5.00).toFixed(2);
-    if (r < 99) return +(Math.random() * (50.0 - 10.0) + 10.0).toFixed(2);
-    return       +(Math.random() * (200.0 - 50.0) + 50.0).toFixed(2);
-}
-function genNext(last) {
-    last = parseFloat(last);
-    const r = Math.random() * 100;
-    // Katta koefdan keyin aksariyat past tushadi (ketma-ket katta bo'lmaydi)
-    if (last >= 50) {
-        // 50x+ dan keyin ~ 70% ehtimol eng past zonaga tushadi
-        if (r < 70) return (Math.random()*(1.10-1.01)+1.01).toFixed(2);
-        if (r < 85) return (Math.random()*(1.50-1.10)+1.10).toFixed(2);
-        if (r < 93) return (Math.random()*(2.00-1.50)+1.50).toFixed(2);
-        if (r < 97) return (Math.random()*(5.00-2.00)+2.00).toFixed(2);
-        if (r < 99) return (Math.random()*(10.0-5.00)+5.00).toFixed(2);
-        return (Math.random()*(50.0-10.0)+10.0).toFixed(2);
-    } else if (last >= 10) {
-        // 10x–50x dan keyin ~ 55% past
-        if (r < 55) return (Math.random()*(1.10-1.01)+1.01).toFixed(2);
-        if (r < 72) return (Math.random()*(1.50-1.10)+1.10).toFixed(2);
-        if (r < 84) return (Math.random()*(2.00-1.50)+1.50).toFixed(2);
-        if (r < 93) return (Math.random()*(5.00-2.00)+2.00).toFixed(2);
-        if (r < 98) return (Math.random()*(10.0-5.00)+5.00).toFixed(2);
-        return (Math.random()*(50.0-10.0)+10.0).toFixed(2);
-    } else if (last >= 5) {
-        // 5x–10x dan keyin ~ 50% past
-        if (r < 50) return (Math.random()*(1.10-1.01)+1.01).toFixed(2);
-        if (r < 68) return (Math.random()*(1.50-1.10)+1.10).toFixed(2);
-        if (r < 80) return (Math.random()*(2.00-1.50)+1.50).toFixed(2);
-        if (r < 92) return (Math.random()*(5.00-2.00)+2.00).toFixed(2);
-        if (r < 97) return (Math.random()*(10.0-5.00)+5.00).toFixed(2);
-        if (r < 99.5) return (Math.random()*(50.0-10.0)+10.0).toFixed(2);
-        return (Math.random()*(200.0-50.0)+50.0).toFixed(2);
-    } else if (last >= 2) {
-        // 2x–5x dan keyin oddiy taqsimot
-        if (r < 38) return (Math.random()*(1.10-1.01)+1.01).toFixed(2);
-        if (r < 57) return (Math.random()*(1.50-1.10)+1.10).toFixed(2);
-        if (r < 74) return (Math.random()*(2.00-1.50)+1.50).toFixed(2);
-        if (r < 88) return (Math.random()*(5.00-2.00)+2.00).toFixed(2);
-        if (r < 95) return (Math.random()*(10.0-5.00)+5.00).toFixed(2);
-        if (r < 99) return (Math.random()*(50.0-10.0)+10.0).toFixed(2);
-        return (Math.random()*(200.0-50.0)+50.0).toFixed(2);
-    } else {
-        // 1.01x–2x dan keyin standart taqsimot
-        if (r < 35) return (Math.random()*(1.10-1.01)+1.01).toFixed(2);
-        if (r < 55) return (Math.random()*(1.50-1.10)+1.10).toFixed(2);
-        if (r < 73) return (Math.random()*(2.00-1.50)+1.50).toFixed(2);
-        if (r < 87) return (Math.random()*(5.00-2.00)+2.00).toFixed(2);
-        if (r < 95) return (Math.random()*(10.0-5.00)+5.00).toFixed(2);
-        if (r < 99) return (Math.random()*(50.0-10.0)+10.0).toFixed(2);
-        return (Math.random()*(200.0-50.0)+50.0).toFixed(2);
+  function getMultiplier(safe, totalMines) {
+    if(safe === 0) return 1.00;
+    // Agar jadvalda bo'lsa — jadvaldan ol
+    if(MULT_TABLE[totalMines] && MULT_TABLE[totalMines][safe] !== undefined){
+      return +MULT_TABLE[totalMines][safe].toFixed(2);
     }
-}
-
-// ---- DOM refs ----
-const plane       = document.getElementById('plane');
-const explosion   = document.getElementById('explosion');
-const coefDisplay = document.getElementById('coefDisplay');
-const coefLabel   = document.getElementById('coefLabel');
-const phaseLabel  = document.getElementById('phaseLabel');
-const betWrap     = document.getElementById('betTimerWrap');
-const betFill     = document.getElementById('betTimerFill');
-const betTxt      = document.getElementById('betTimerTxt');
-const trajPath    = document.getElementById('trajPath');
-const winFlash    = document.getElementById('winFlash');
-const arena       = document.getElementById('arena');
-
-// ---- GAME STATE ----
-const BETTING_DURATION = 3000;   // 3 soniya
-const FLYING_DURATION  = 6000;   // 6 soniya
-
-let gamePhase   = 'betting';  // 'betting' | 'flying' | 'crashed'
-let crashCoef   = 1.00;
-let flyStart    = 0;
-let phaseStart  = 0;
-let animFrameId = null;
-
-// plane start / end positions (% of arena)
-const PLANE_START = { x: 5, y: 82 };   // bottom-left (% from left, % from top)
-const PLANE_END   = { x: 82, y: 8 };   // top-right
-
-function lerp(a, b, t) { return a + (b - a) * t; }
-
-function setPhaseLabel(text, cls) {
-    phaseLabel.textContent = text;
-    phaseLabel.className   = 'phase-label ' + cls;
-}
-
-// ---- TRAJECTORY dash animation ----
-function setTrajProgress(t) {
-    const len = 600;
-    trajPath.style.strokeDashoffset = (len * (1 - t)).toFixed(1);
-}
-
-// ---- PLANE position ----
-function setPlanePos(t) {
-    const arenaW = arena.offsetWidth  || 360;
-    const arenaH = arena.offsetHeight || 280;
-
-    const pxStart = { x: arenaW * 0.05, y: arenaH * 0.80 };
-    const pxEnd   = { x: arenaW * 0.82, y: arenaH * 0.05 };
-
-    // Curve using easing
-    const ease = 1 - Math.pow(1 - t, 2); // ease-out quad
-    const x = lerp(pxStart.x, pxEnd.x, ease);
-    const y = lerp(pxStart.y, pxEnd.y, ease);
-
-    // Angle
-    const dx = (pxEnd.x - pxStart.x);
-    const dy = (pxEnd.y - pxStart.y);
-    const baseAngle = Math.atan2(dy, dx) * (180 / Math.PI);
-    const angle = baseAngle * ease;   // gentle tilt
-
-    plane.style.left   = (x - 45) + 'px';
-    plane.style.top    = (y - 30) + 'px';
-    plane.style.bottom = 'unset';
-    plane.style.transform = `rotate(${angle}deg)`;
-}
-
-// ---- COEF counter ----
-function calcCurrentCoef(t) {
-    // 0 → crashCoef over t=0..1
-    return (1.0 + (crashCoef - 1.0) * Math.pow(t, 0.8)).toFixed(2);
-}
-
-// ---- PHASE: BETTING ----
-function startBetting() {
-    gamePhase  = 'betting';
-    phaseStart = performance.now();
-    crashCoef  = genCrashCoef();
-
-    // Reset plane
-    const arenaW = arena.offsetWidth  || 360;
-    const arenaH = arena.offsetHeight || 280;
-    plane.style.left      = (arenaW * 0.05 - 45) + 'px';
-    plane.style.top       = (arenaH * 0.80 - 30) + 'px';
-    plane.style.bottom    = 'unset';
-    plane.style.transform = 'rotate(0deg)';
-    plane.style.display   = 'block';
-    explosion.style.display = 'none';
-
-    // Traj reset
-    setTrajProgress(0);
-
-    // Coef
-    coefDisplay.textContent = '0.00x';
-    coefDisplay.className   = 'coef-value';
-    coefLabel.textContent   = 'Stavka qo\'ying';
-
-    setPhaseLabel('🎰 Stavka qo\'ying', 'betting');
-    betWrap.style.display = 'block';
-
-    cancelAnimationFrame(animFrameId);
-    animFrameId = requestAnimationFrame(bettingLoop);
-}
-
-function bettingLoop(now) {
-    const elapsed = now - phaseStart;
-    const t       = Math.min(elapsed / BETTING_DURATION, 1);
-    const remain  = Math.max((BETTING_DURATION - elapsed) / 1000, 0);
-
-    betFill.style.width  = ((1 - t) * 100) + '%';
-    betTxt.textContent   = `Raund boshlanishiga: ${remain.toFixed(1)}s`;
-
-    if (t < 1) {
-        animFrameId = requestAnimationFrame(bettingLoop);
-    } else {
-        startFlying();
+    // Boshqa minalar uchun matematik formula
+    let mult = 1;
+    for(let i = 0; i < safe; i++){
+      mult *= (GRID_SIZE - totalMines - i) / (GRID_SIZE - i);
     }
-}
+    return +(1 / mult * 0.97).toFixed(2);
+  }
+  function selectMines(count){
+    if(gameActive) return;
+    mineCount = count;
+    document.querySelectorAll('.mine-pick-btn').forEach(btn => btn.classList.remove('active-mine'));
+    document.getElementById('mineBtn' + count).classList.add('active-mine');
+    document.getElementById('mineStat').textContent = mineCount;
+    document.getElementById('leftStat').textContent = GRID_SIZE;
+  }
 
-// ---- PHASE: FLYING ----
-function startFlying() {
-    gamePhase  = 'flying';
-    phaseStart = performance.now();
+  function changeMines(delta){
+    if(gameActive) return;
+    mineCount = Math.max(1, Math.min(20, mineCount + delta));
+    document.getElementById('mineCount').textContent = mineCount;
+    document.getElementById('mineStat').textContent = mineCount;
+    document.getElementById('leftStat').textContent = GRID_SIZE;
+  }
 
-    betWrap.style.display = 'none';
-    setPhaseLabel('✈️ Uchmoqda!', 'flying');
-    coefDisplay.className = 'coef-value flying';
-    coefLabel.textContent = 'uchmoqda...';
-
-    cancelAnimationFrame(animFrameId);
-    animFrameId = requestAnimationFrame(flyingLoop);
-}
-
-function flyingLoop(now) {
-    const elapsed = now - phaseStart;
-    const t       = Math.min(elapsed / FLYING_DURATION, 1);
-
-    // Plane position
-    setPlanePos(t);
-
-    // Trajectory
-    setTrajProgress(t);
-
-    // Coef (starts at 0, ends at crashCoef)
-    const cur = calcCurrentCoef(t);
-    coefDisplay.textContent = cur + 'x';
-
-    if (t < 1) {
-        animFrameId = requestAnimationFrame(flyingLoop);
-    } else {
-        startCrashed();
+  function buildGrid(){
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    revealed = new Array(GRID_SIZE).fill(false);
+    for(let i = 0; i < GRID_SIZE; i++){
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.index = i;
+      cell.onclick = () => clickCell(i);
+      grid.appendChild(cell);
     }
-}
+  }
 
-// ---- PHASE: CRASHED ----
-function startCrashed() {
-    gamePhase = 'crashed';
-    cancelAnimationFrame(animFrameId);
-
-    // Plane → explosion
-    plane.style.display = 'none';
-
-    const arenaW = arena.offsetWidth  || 360;
-    const arenaH = arena.offsetHeight || 280;
-    explosion.style.left    = (arenaW * 0.78 - 55) + 'px';
-    explosion.style.top     = (arenaH * 0.02) + 'px';
-    explosion.style.display = 'block';
-    explosion.style.bottom  = 'unset';
-
-    // Final coef
-    coefDisplay.textContent = crashCoef.toFixed(2) + 'x';
-    coefDisplay.className   = 'coef-value crashed';
-    coefLabel.textContent   = '💥 Parvoz tugadi!';
-
-    setPhaseLabel('💥 CRASH!', 'crashed');
-
-    addHistory(crashCoef);
-
-    // Flash if good
-    if (crashCoef >= 2) {
-        winFlash.classList.add('show');
-        setTimeout(() => winFlash.classList.remove('show'), 600);
+  function placeMines(){
+    mines = [];
+    let pool = Array.from({length: GRID_SIZE}, (_, i) => i);
+    for(let i = 0; i < mineCount; i++){
+      const idx = Math.floor(Math.random() * pool.length);
+      mines.push(pool[idx]);
+      pool.splice(idx, 1);
     }
+  }
 
-    // Wait 2.5s then bet again
-    setTimeout(startBetting, 2500);
-}
+  function startGame(){
+    if(score <= 0){
+      document.getElementById('statusMsg').textContent = '❌ Ball yetarli emas!';
+      return;
+    }    gameActive = true;
+    safeClicks = 0;
+    placeMines();
+    buildGrid();
+    updateStats();
+    document.getElementById('playBtn').style.display = 'none';
+    document.getElementById('cashoutBtn').style.display = 'block';
+    document.getElementById('multiplierDisplay').textContent = 'x1.00';
+    document.getElementById('statusMsg').textContent = '🎯 Xavfsiz katakni bosing!';
+    updateNextMults();
+  }
 
-// ---- PRELOADER ----
-window.addEventListener('DOMContentLoaded', () => {
-    // Initial history
-    [1.42, 3.87, 1.12, 7.50, 2.34, 1.09, 4.22, 12.10].forEach(v => {
-        historyArr.push(v);
+  function clickCell(index){
+    if(!gameActive || revealed[index]) return;
+    revealed[index] = true;
+    const cell = document.querySelector(`.cell[data-index="${index}"]`);
+
+    if(mines.includes(index)){
+      // MINE!
+      cell.classList.add('mine');
+      cell.textContent = '💣';
+      gameActive = false;
+      // Show all mines
+      setTimeout(() => {
+        mines.forEach(m => {
+          const mc = document.querySelector(`.cell[data-index="${m}"]`);
+          if(!revealed[m]){ mc.classList.add('mine'); mc.textContent = '💣'; }
+          mc.classList.add('disabled');
+        });
+        showResult(false);
+      }, 300);    } else {
+      // SAFE!
+      cell.classList.add('safe');
+      cell.textContent = '⭐';
+      safeClicks++;
+      updateStats();
+      const mult = getMultiplier(safeClicks, mineCount);
+      document.getElementById('multiplierDisplay').textContent = `x${mult}`;
+      document.getElementById('statusMsg').textContent = `✅ Xavfsiz! x${mult} koeffitsient`;
+      updateNextMults();
+
+      // Auto win if all safe cells revealed
+      if(safeClicks === GRID_SIZE - mineCount){
+        cashOut();
+      }
+    }
+  }
+
+  function cashOut(){
+    if(!gameActive || safeClicks === 0) return;
+    gameActive = false;
+    const mult = getMultiplier(safeClicks, mineCount);
+    const won = Math.floor(score * 0.1 * mult);
+    score += won;
+    updateScoreDisplay();
+    document.getElementById('playBtn').style.display = 'block';
+    document.getElementById('cashoutBtn').style.display = 'none';
+    document.getElementById('multiplierDisplay').textContent = '';
+    revealAllMines();
+    showResult(true, won, mult);
+  }
+
+  function revealAllMines(){
+    mines.forEach(m => {
+      const mc = document.querySelector(`.cell[data-index="${m}"]`);
+      if(mc && !revealed[m]){
+        mc.classList.add('mine', 'disabled');
+        mc.textContent = '💣';
+      }
     });
-    renderHistory();
+  }
 
-    setTimeout(() => {
-        const pre = document.getElementById('preloader');
-        pre.classList.add('hide');
-        setTimeout(() => pre.remove(), 900);
-        // Samolyotni pastda kutish holatida qo'yamiz — harakat yo'q
-        resetToIdle();
-    }, 1900);
-});
+  function showResult(win, won=0, mult=1){
+    document.getElementById('playBtn').style.display = 'block';
+    document.getElementById('cashoutBtn').style.display = 'none';
 
-// ---- IDLE (kutish) holati ----
-function resetToIdle() {
-    gamePhase = 'idle';
-    cancelAnimationFrame(animFrameId);
+    const overlay = document.getElementById('overlay');
+    const emoji = document.getElementById('popupEmoji');
+    const title = document.getElementById('popupTitle');
+    const msg = document.getElementById('popupMsg');
+    const sc = document.getElementById('popupScore');
 
-    const arenaW = arena.offsetWidth  || 360;
-    const arenaH = arena.offsetHeight || 280;
-    plane.style.left      = (arenaW * 0.05 - 45) + 'px';
-    plane.style.top       = (arenaH * 0.80 - 30) + 'px';
-    plane.style.bottom    = 'unset';
-    plane.style.transform = 'rotate(0deg)';
-    plane.style.display   = 'block';
-    explosion.style.display = 'none';
-    setTrajProgress(0);
+    if(win){
+      emoji.textContent = '🎉';
+      title.textContent = "G'ALABA!";
+      title.style.color = '#43e97b';
+      msg.textContent = `x${mult} koeffitsient bilan yutdingiz!`;
+      sc.textContent = `+${won} ball`;
+      sc.style.color = '#43e97b';
+      spawnConfetti();
+    } else {
+      emoji.textContent = '💣';
+      title.textContent = "PORTLADI!";
+      title.style.color = '#ff4444';
+      msg.textContent = 'Minaga tegdingiz!';
+      sc.textContent = 'Yutqazdingiz!';
+      sc.style.color = '#ff4444';
+    }
+    overlay.classList.add('show');
+  }
+  function closeOverlay(){
+    document.getElementById('overlay').classList.remove('show');
+    buildGrid();
+    updateStats();
+    document.getElementById('multiplierDisplay').textContent = '';
+    document.getElementById('statusMsg').textContent = 'Boshlash tugmasini bosing!';
+    document.getElementById('nextMultsPanel').style.display = 'none';
+    // Remove confetti
+    document.querySelectorAll('.confetti-piece').forEach(e => e.remove());
+  }
 
-    coefDisplay.textContent = '—';
-    coefDisplay.className   = 'coef-value';
-    coefLabel.textContent   = 'signal kuting...';
-    setPhaseLabel('⏳ Signal kuting', 'betting');
-    betWrap.style.display = 'none';
-}
+  function updateNextMults(){
+    const panel = document.getElementById('nextMultsPanel');
+    const cells = panel.querySelectorAll('.nm-cell');
+    cells.forEach((el, i) => {
+      const m = getMultiplier(safeClicks + 1 + i, mineCount);
+      el.textContent = `x${m}`;
+    });
+    panel.style.display = 'flex';
+  }
 
-// ---- SIGNAL BUTTON ----
-document.getElementById('calcBtn').addEventListener('click', () => {
-    const btn = document.getElementById('calcBtn');
+  function updateStats(){
+    document.getElementById('safeStat').textContent = safeClicks;
+    document.getElementById('mineStat').textContent = mineCount;
+    document.getElementById('leftStat').textContent = GRID_SIZE - safeClicks - mineCount;
+  }
 
-    // Tugmani vaqtincha o'chirish
-    btn.disabled = true;
-    btn.textContent = '⏳ Analizlanmoqda...';
-    btn.style.opacity = '0.7';
+  function updateScoreDisplay(){
+    document.getElementById('scoreDisplay').textContent = score.toLocaleString();
+  }
 
-    // Avvalgi animatsiyani to'xtatish
-    cancelAnimationFrame(animFrameId);
+  function spawnConfetti(){
+    const colors = ['#f0c040','#43e97b','#4facfe','#ff6b6b','#a18cd1','#ffecd2'];
+    for(let i = 0; i < 80; i++){
+      setTimeout(() => {
+        const c = document.createElement('div');
+        c.className = 'confetti-piece';
+        c.style.cssText = `
+          left:${Math.random()*100}%;
+          top:-10px;
+          background:${colors[Math.floor(Math.random()*colors.length)]};
+          animation-duration:${1.5+Math.random()*2}s;
+          animation-delay:${Math.random()*0.5}s;
+          transform:rotate(${Math.random()*360}deg);
+          width:${6+Math.random()*10}px;
+          height:${6+Math.random()*10}px;
+        `;
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 3000);
+      }, i * 20);
+    }
+  }
 
-    // Signal generatsiya — uchish uchun ishlatiladi
-    const nextVal = parseFloat(genCrashCoef().toFixed(2));
-    const nextStr = nextVal.toFixed(2);
-    crashCoef = nextVal; // samolyot shu koefga qadar uchadi
-
-    // Rang
-    let coefColor = '#a259ff';
-    if (nextVal >= 10) coefColor = '#ff4444';
-    else if (nextVal >= 5) coefColor = '#ff9900';
-    else if (nextVal >= 2) coefColor = '#ffe000';    // Ikkalasini bir xil qiymat bilan yangilash
-    const signalEl  = document.getElementById('signalVal');
-    signalEl.textContent  = 'x' + nextStr;
-    signalEl.style.color  = coefColor;
-    document.getElementById('signalSub').textContent = 'Keyingi raund analiz koeffitsienti';
-
-    // 1.2s keyin samolyot uchishni BOSHLAYDI (betting o'tkazib yuboriladi)
-    setTimeout(() => {
-        // Plane reset
-        const arenaW = arena.offsetWidth  || 360;
-        const arenaH = arena.offsetHeight || 280;
-        plane.style.left      = (arenaW * 0.05 - 45) + 'px';
-        plane.style.top       = (arenaH * 0.80 - 30) + 'px';
-        plane.style.bottom    = 'unset';
-        plane.style.transform = 'rotate(0deg)';
-        plane.style.display   = 'block';
-        explosion.style.display = 'none';
-        setTrajProgress(0);
-
-        // Tugmani qaytarish
-        btn.disabled = false;
-        btn.textContent = '📡 SIGNAL OLISH';
-        btn.style.opacity = '1';
-
-        // To'g'ridan-to'g'ri uchishni boshlash
-        startFlying();
-    }, 1200);
-});
+  // Init
+  buildGrid();
+  updateScoreDisplay();
+  updateStats();
 </script>
 </body>
 </html>
