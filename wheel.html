@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1x Ice Fishing - Wheel</title>
+  <style>    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(180deg, #b8d9e4 0%, #7ab3cc 40%, #4a82c8 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      font-family: 'Arial Black', Arial, sans-serif;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 20px 0 30px;
+    }
+
+    /* === ICE background === */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 30%;
+      background: linear-gradient(180deg, #ddeeff 0%, #b8d9e4 100%);
+      z-index: 0;
+    }    .game-container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      max-width: 700px;
+      padding: 6px 10px 12px;
+    }    /* === WHEEL WRAPPER === */
+    .wheel-wrapper {
+      position: relative;
+      width: min(680px, 96vw);
+      height: min(680px, 96vw);
+    }    canvas#wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      display: block;
+      position: relative;
+      z-index: 2;
+    }    /* === POINTER — Canvas da chiziladi, bu faqat anchor === */    canvas#lineCanvas {
+      position: absolute;
+      top: -40px; left: 0;
+      width: 100%;
+      height: calc(100% + 40px);
+      z-index: 11;
+      pointer-events: none;
+    }
+    .wheel-frame {
+      position: absolute;
+      inset: -14px;
+      border-radius: 50%;
+      background: conic-gradient(
+        #c8d8e8 0deg, #a0b8cc 10deg,
+        #c8d8e8 10deg, #a0b8cc 20deg,
+        #c8d8e8 20deg, #a0b8cc 30deg,
+        #c8d8e8 30deg, #a0b8cc 40deg,
+        #c8d8e8 40deg, #a0b8cc 50deg,
+        #c8d8e8 50deg, #a0b8cc 60deg,
+        #c8d8e8 60deg, #a0b8cc 70deg,
+        #c8d8e8 70deg, #a0b8cc 80deg,
+        #c8d8e8 80deg, #a0b8cc 90deg,
+        #c8d8e8 90deg, #a0b8cc 100deg,
+        #c8d8e8 100deg, #a0b8cc 110deg,
+        #c8d8e8 110deg, #a0b8cc 120deg,
+        #c8d8e8 120deg, #a0b8cc 130deg,
+        #c8d8e8 130deg, #a0b8cc 140deg,
+        #c8d8e8 140deg, #a0b8cc 150deg,
+        #c8d8e8 150deg, #a0b8cc 160deg,
+        #c8d8e8 160deg, #a0b8cc 170deg,
+        #c8d8e8 170deg, #a0b8cc 180deg,
+        #c8d8e8 180deg, #a0b8cc 190deg,
+        #c8d8e8 190deg, #a0b8cc 200deg,
+        #c8d8e8 200deg, #a0b8cc 210deg,
+        #c8d8e8 210deg, #a0b8cc 220deg,
+        #c8d8e8 220deg, #a0b8cc 230deg,
+        #c8d8e8 230deg, #a0b8cc 240deg,
+        #c8d8e8 240deg, #a0b8cc 250deg,
+        #c8d8e8 250deg, #a0b8cc 260deg,
+        #c8d8e8 260deg, #a0b8cc 270deg,
+        #c8d8e8 270deg, #a0b8cc 280deg,
+        #c8d8e8 280deg, #a0b8cc 290deg,
+        #c8d8e8 290deg, #a0b8cc 300deg,
+        #c8d8e8 300deg, #a0b8cc 310deg,
+        #c8d8e8 310deg, #a0b8cc 320deg,
+        #c8d8e8 320deg, #a0b8cc 330deg,
+        #c8d8e8 330deg, #a0b8cc 340deg,
+        #c8d8e8 340deg, #a0b8cc 350deg,
+        #c8d8e8 350deg, #a0b8cc 360deg
+      );      box-shadow: 0 0 0 4px #3a5a70, 0 8px 32px #0006;    }/* === CENTER LOGO === */
+    .wheel-center {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      width: 23%;
+      height: 23%;
+      background: radial-gradient(circle, #e8f4f8, #b0ccd8);
+      border-radius: 50%;
+      border: 4px solid #8aacbe;
+      box-shadow: 0 2px 12px #0005;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 900;
+      color: #2a5a8a;
+      text-align: center;
+      letter-spacing: 1px;
+      user-select: none;
+    }    /* === BET BUTTONS === */
+    .bet-section {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .fish-buttons {
+      display: flex;      gap: 6px;
+      justify-content: center;
+    }
+
+    .fish-btn {
+      flex: 1;
+      max-width: 100px;
+      padding: 8px 6px 7px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      transition: transform 0.1s, box-shadow 0.1s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      box-shadow: 0 3px 8px #0004;
+      position: relative;
+      overflow: hidden;
+    }
+    .fish-btn:active { transform: scale(0.95); }
+    .fish-btn.selected {
+      box-shadow: 0 0 0 3px #fff, 0 4px 16px #0006;
+      transform: scale(1.05);
+    }    .fish-btn .fish-icon {
+      font-size: 20px;
+      line-height: 1;
+    }
+    .fish-btn .fish-name {
+      font-size: 10px;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 1px 3px #0007;
+      line-height: 1.1;
+      text-align: center;
+    }
+    .fish-btn .fish-odds {
+      font-size: 9px;
+      color: rgba(255,255,255,0.85);
+    }
+
+    .btn-blue {
+      background: linear-gradient(135deg, #3a7fc1, #5aaee8);
+    }
+    .btn-orange {
+      background: linear-gradient(135deg, #c17a1a, #e8a83a);
+    }
+    .btn-red {
+      background: linear-gradient(135deg, #a01818, #d43030);
+    }    /* === SPIN BUTTON === */
+    .spin-btn {
+      padding: 10px 22px;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1a8a3a, #2ecc60);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 16px #0a5a2080;
+      transition: transform 0.1s, box-shadow 0.1s;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .spin-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px #0a5a2099; }
+    .spin-btn:active { transform: scale(0.97); }
+    .spin-btn:disabled {
+      background: linear-gradient(135deg, #555, #777);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* === RESULT POPUP === */
+    .result-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .result-overlay.show { display: flex; }
+    .result-box {
+      background: linear-gradient(135deg, #1a3a5a, #2a5a8a);
+      border: 3px solid #5aaee8;
+      border-radius: 24px;
+      padding: 40px 50px;
+      text-align: center;
+      box-shadow: 0 8px 40px #000a;
+      animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .result-icon { font-size: 64px; margin-bottom: 10px; }
+    .result-title { font-size: 22px; color: #aaddff; margin-bottom: 6px; }
+    .result-fish { font-size: 26px; font-weight: 900; margin-bottom: 16px; }    .result-win { font-size: 42px; font-weight: 900; color: #2ecc60; }
+    .result-win.lose { color: #e74c3c; }
+    .result-win:empty { display: none; }
+    .result-close {
+      margin-top: 20px;
+      padding: 12px 40px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      background: #5aaee8;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    /* === LAST RESULTS === */
+    .last-results {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }    .last-dot {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+    }
+
+    /* === STATS === */
+    .stats-row {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      font-size: 13px;
+      color: rgba(255,255,255,0.85);
+      text-shadow: 0 1px 3px #0005;
+    }
+    .stat-item { display: flex; align-items: center; gap: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="game-container">
+  <!-- Last results -->
+  <div class="last-results" id="lastResults"></div>
+
+  <!-- Wheel -->
+  <div class="wheel-wrapper">    <div class="wheel-frame"></div>    <canvas id="wheel" width="680" height="680"></canvas>
+    <canvas id="lineCanvas" width="680" height="720"></canvas>
+    <div class="wheel-center">AI</div>
+  </div>
+
+  <!-- Bet section -->
+  <div class="bet-section">
+
+    <!-- Fish buttons -->
+    <div class="fish-buttons">
+      <button class="fish-btn btn-blue selected" id="btn-blue" onclick="selectFish('blue')">
+        <span class="fish-icon">🐟</span>
+        <span class="fish-name">LIL'<br>BLUES</span>
+        <span class="fish-odds">x2</span>
+      </button>
+      <button class="fish-btn btn-orange" id="btn-orange" onclick="selectFish('orange')">
+        <span class="fish-icon">🐠</span>
+        <span class="fish-name">BIG<br>ORANGES</span>
+        <span class="fish-odds">x14</span>
+      </button>
+      <button class="fish-btn btn-red" id="btn-red" onclick="selectFish('red')">
+        <span class="fish-icon">🎣</span>
+        <span class="fish-name">HUGE<br>REDS</span>
+        <span class="fish-odds">x35</span>
+      </button>
+    </div>    <!-- Spin button -->
+    <button class="spin-btn" id="spinBtn" onclick="spin()">🎣 TASHLASH</button>
+
+  </div><!-- /bet-section -->
+
+</div><!-- /game-container -->
+
+<!-- Result popup -->
+<div class="result-overlay" id="resultOverlay">
+  <div class="result-box">
+    <div class="result-icon" id="resultIcon">🐟</div>
+    <div class="result-title">G'ildirak to'xtadi:</div>
+    <div class="result-fish" id="resultFish">LIL' BLUE</div>
+    <div class="result-win" id="resultWin">+2,000</div>
+    <button class="result-close" onclick="closeResult()">DAVOM ETISH</button>
+  </div>
+</div>
+
+<script>
+// =============================================
+// WHEEL CONFIG
+// Jami 49 segment:
+// Blue: 4, Orange: 2, Red: 1, Oq: 21, Kumush: 21
+// =============================================
+
+// =============================================
+// RASMGA QARAB ANIQ JOYLASHUV (49 segment)
+// Soat miliga qarshi, yuqoridan (0-indeks = yuqori)
+// W=oq, S=kumush, B=ko'k, O=to'q sariq, R=qizil
+// Rasmdan: yuqorida RED, keyin W/S almashinib, 
+// BLUElar va ORANGElar ma'lum pozitsiyalarda
+// =============================================
+var W = { type:'white',  color:'#eef6ff', borderColor:'#aaccee', label:'' };
+var S = { type:'silver', color:'#5a7a8e', borderColor:'#2a4a5e', label:'' };
+var B = { type:'blue',   color:'#3a7fc1', borderColor:'#1a4f91', label:"LIL' BLUES" };
+var O = { type:'orange', color:'#d4881a', borderColor:'#a05808', label:'BIG ORANGES' };
+var R = { type:'red',    color:'#c02020', borderColor:'#8a0808', label:'HUGE REDS' };
+
+// =============================================
+// TARTIB: 53 ta segment — soat yo'nalishi, soat 12 = index 0
+//
+// Rangli sektorlar soat bo'yicha:
+//   12:00 → RED            (index 0)
+//    2:00 → BLUE #1        (index 9,  360*9/53  ≈ 61°)
+//    4:00 → ORANGE #1      (index 18, 360*18/53 ≈ 122°)
+//    5:30 → BLUE #2        (index 23, 360*23/53 ≈ 156°)
+//    6:30 → BLUE #3        (index 28, 360*28/53 ≈ 190°)
+//    8:00 → ORANGE #2      (index 36, 360*36/53 ≈ 244°)
+//   10:00 → BLUE #4        (index 44, 360*44/53 ≈ 299°)
+//
+// Bo'shliqlardagi W/S tartib: WS almashinib ketadi
+// W jami=23, S jami=23  →  jami 53 ✓
+// =============================================
+var SEGMENTS = [
+  //  idx  ≈deg   soat
+  R,              // 0    0°    12:00  RED
+  W,S,W,S,W,S,W,S,// 1-8  6-54°  bo'shliq (4W+4S)
+  B,              // 9    61°   ~2:00  BLUE #1
+  W,S,W,S,W,S,W,S,// 10-17 67-115° bo'shliq (4W+4S)
+  O,              // 18   122°  ~4:00  ORANGE #1
+  W,S,W,S,        // 19-22 129-149° bo'shliq (2W+2S)
+  B,              // 23   156°  ~5:30  BLUE #2
+  W,S,W,S,        // 24-27 163-183° bo'shliq (2W+2S)
+  B,              // 28   190°  ~6:30  BLUE #3
+  W,S,W,S,W,S,W,  // 29-35 197-237° bo'shliq (4W+3S)
+  O,              // 36   244°  ~8:00  ORANGE #2
+  S,W,S,W,S,W,S,  // 37-43 251-291° bo'shliq (3W+4S)
+  B,              // 44   298°  ~10:00 BLUE #4
+  W,S,W,S,W,S,W,S,// 45-52 305-353° bo'shliq (4W+4S)
+  //
+  // W hisob: [1,3,5,7]=4 + [10,12,14,16]=4 + [19,21]=2 + [24,26]=2
+  //        + [29,31,33,35]=4 + [38,40,42]=3 + [45,47,49,51]=4  = 23 ✓
+  // S hisob: [2,4,6,8]=4 + [11,13,15,17]=4 + [20,22]=2 + [25,27]=2
+  //        + [30,32,34]=3 + [37,39,41,43]=4 + [46,48,50,52]=4  = 23 ✓
+  // Rangli: R=1, B=4, O=2 = 7 ta ✓  Jami: 23+23+7 = 53 ✓
+];
+
+var TOTAL = SEGMENTS.length;
+var SEG_ANGLE = (2 * Math.PI) / TOTAL;
+
+// =============================================
+// GAME STATE
+// =============================================
+var balance = 10000;
+var selectedFish = 'blue';
+var isSpinning = false;
+// Soat 12 = canvas yuqori = -Math.PI/2
+// Segment 0 (RED) ning markazi soat 12 da bo'lishi uchun:
+// Segment 0 startAngle = -PI/2 - SEG_ANGLE/2
+var currentAngle = -Math.PI / 2 - (2 * Math.PI / 53) / 2;
+var lastResults = [];
+var totalGames = 0;
+
+var MULTIPLIERS = { blue: 2, orange: 14, red: 35 };
+var FISH_ICONS  = { blue: '🐟', orange: '🐠', red: '🎣' };
+var FISH_NAMES  = { blue: "LIL' BLUES", orange: 'BIG ORANGES', red: 'HUGE REDS' };
+
+// =============================================
+// CANVAS DRAW
+// =============================================
+var canvas = document.getElementById('wheel');
+var ctx = canvas.getContext('2d');
+var CX = canvas.width / 2, CY = canvas.height / 2, R = 320;
+
+function drawWheel(angle) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (var i = 0; i < TOTAL; i++) {
+    var seg = SEGMENTS[i];
+    var startA = angle + i * SEG_ANGLE;
+    var endA   = startA + SEG_ANGLE;
+    var midA   = startA + SEG_ANGLE / 2;
+
+    // Fill
+    ctx.beginPath();
+    ctx.moveTo(CX, CY);
+    ctx.arc(CX, CY, R, startA, endA);
+    ctx.closePath();    // Fill — oq va kumush aniq farq
+    if (seg.type === 'white') {
+      // Yorqin qor-oq: markazdan chekkaga
+      var grd = ctx.createRadialGradient(CX, CY, R*0.15, CX, CY, R);
+      grd.addColorStop(0, '#ffffff');
+      grd.addColorStop(0.6, '#e8f3ff');
+      grd.addColorStop(1, '#c0d8f0');
+      ctx.fillStyle = grd;
+    } else if (seg.type === 'silver') {
+      // To'q ko'k-kulrang
+      var grd = ctx.createRadialGradient(CX, CY, R*0.15, CX, CY, R);
+      grd.addColorStop(0, '#6a8ea8');
+      grd.addColorStop(0.5, '#4a6a80');
+      grd.addColorStop(1, '#2a4a60');      ctx.fillStyle = grd;
+    } else {
+      ctx.fillStyle = seg.color;
+    }
+    ctx.fill();
+
+    // Segment chegarasi(pie slice chiziq) — aniq ko'rinish uchun
+    ctx.beginPath();
+    ctx.moveTo(CX, CY);
+    ctx.arc(CX, CY, R, startA, endA);
+    ctx.closePath();
+    // Divider lines — oq segment uchun to'q, kumush uchun yorqin
+    if (seg.type === 'white') {
+      ctx.strokeStyle = 'rgba(60,90,130,0.8)';
+      ctx.lineWidth = 2;
+    } else if (seg.type === 'silver') {
+      ctx.strokeStyle = 'rgba(160,200,230,0.7)';
+      ctx.lineWidth = 2;
+    } else {
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+      ctx.lineWidth = 2.5;
+    }    ctx.stroke();
+
+    // Oq/Kumush segmentlarda kichik belgi chizish (vizual farq uchun)
+    if (seg.type === 'white' || seg.type === 'silver') {
+      ctx.save();
+      var labelR2 = R * 0.68;
+      var tx2 = CX + labelR2 * Math.cos(midA);
+      var ty2 = CY + labelR2 * Math.sin(midA);
+      ctx.translate(tx2, ty2);
+      ctx.rotate(midA + Math.PI / 2);
+
+      // Clip — segment ichida qolsin (lokal koordinata)
+      var halfA = SEG_ANGLE / 2;
+      var localR = labelR2;
+      // Sodda to'rtburchak clip (segment tor bo'lgani uchun)
+      var arcLen = halfA * localR;
+      ctx.beginPath();
+      ctx.rect(-arcLen, -R * 0.18, arcLen * 2, R * 0.36);
+      ctx.clip();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      if (seg.type === 'white') {
+        ctx.font = 'bold 19px Arial Black';
+        ctx.fillStyle = '#1a4a7a';
+        ctx.shadowColor = 'rgba(255,255,255,0.8)';
+        ctx.shadowBlur = 4;
+        ctx.fillText('W', 0, 0);
+      } else {
+        ctx.font = 'bold 19px Arial Black';
+        ctx.fillStyle = '#d0eeff';
+        ctx.shadowColor = 'rgba(0,30,60,0.8)';
+        ctx.shadowBlur = 4;
+        ctx.fillText('S', 0, 0);
+      }
+      ctx.restore();
+    }
+
+    // Rangli segmentlar: to'liq pie slice + arc bo'ylab matn
+    if (seg.type === 'blue' || seg.type === 'orange' || seg.type === 'red') {
+      var innerR = 92;
+      var outerR = R - 4;
+
+      // 1) Arc slice chizish
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(CX, CY, outerR, startA, endA);
+      ctx.arc(CX, CY, innerR, endA, startA, true);
+      ctx.closePath();
+
+      var grdC = ctx.createRadialGradient(CX, CY, innerR, CX, CY, outerR);      if (seg.type === 'blue') {
+        grdC.addColorStop(0, '#5ab8f5');
+        grdC.addColorStop(0.5, '#2a7ec8');
+        grdC.addColorStop(1, '#0d3a7a');
+      } else if (seg.type === 'orange') {
+        grdC.addColorStop(0, '#f7d060');
+        grdC.addColorStop(0.5, '#d4881a');
+        grdC.addColorStop(1, '#7a4000');
+      } else {
+        grdC.addColorStop(0, '#f07070');
+        grdC.addColorStop(0.5, '#c02020');
+        grdC.addColorStop(1, '#6a0000');
+      }
+      ctx.fillStyle = grdC;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)';      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();      // 2) Matnni segment bo'ylab UZUNASIGA yozish
+      var segH = outerR - innerR;
+      // Segment kengligi (arc uzunligi o'rtada)
+      var midR = innerR + segH * 0.5;
+      var segArcW = SEG_ANGLE * midR;
+
+      ctx.save();
+      ctx.translate(CX, CY);
+      ctx.rotate(midA);
+
+      // Clip — segment ichida qolsin
+      ctx.save();
+      ctx.beginPath();
+      // Lokal koordinatada (rotate qilingan): X = radius tomon, Y = yon
+      // Arc clip: tashqi va ichki yoylar
+      var halfAngle = SEG_ANGLE / 2;
+      ctx.arc(0, 0, outerR - 2, -halfAngle, halfAngle);
+      ctx.arc(0, 0, innerR + 2, halfAngle, -halfAngle, true);
+      ctx.closePath();
+      ctx.clip();
+
+      ctx.shadowColor = 'rgba(0,0,0,0.9)';
+      ctx.shadowBlur = 4;
+      ctx.textBaseline = 'middle';
+
+      // Ko'paytiruvchi — tashqi qismda
+      var mult = seg.type === 'blue' ? 'x2' : seg.type === 'orange' ? 'x14' : 'x35';
+      // Shrift o'lchamini arc kengligiga moslashtir (katta, lekin chiqmasin)
+      var multFs = Math.min(18, segArcW * 0.42);
+      ctx.font = 'bold ' + multFs + 'px Arial Black';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'right';
+      ctx.fillText(mult, outerR - 6, 0);
+
+      // Label — segment ichida
+      var label = seg.type === 'blue' ? "LIL' BLUES"
+                : seg.type === 'orange' ? 'BIG ORANGES'
+                : 'HUGE REDS';
+      var labelFs = Math.min(16, segArcW * 0.36);
+      ctx.font = 'bold ' + labelFs + 'px Arial Black';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      var labelR = innerR + segH * 0.55;
+      ctx.fillText(label, labelR, 0);
+
+      // Emoji — ichki qismda
+      var emojiFs = Math.min(16, segArcW * 0.38);
+      ctx.font = emojiFs + 'px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(
+        seg.type === 'blue' ? '🐟' : seg.type === 'orange' ? '🐠' : '🦈',
+        innerR + segH * 0.2, 0
+      );
+
+      ctx.restore(); // clip restore
+      ctx.restore(); // translate+rotate restore
+    }
+  }
+  // === MIXLAR (pegs) — har segment chegarasida ===
+  var pegR    = R + 8;   // mix aylana radiusi (g'ildirak chekkasidan tashqarida)
+  var pegLen  = 18;      // mix uzunligi (tashqariga chiqadi)
+  var pegW    = 4;       // mix qalinligi
+  for (var p = 0; p < TOTAL; p++) {
+    var pegA = angle + p * SEG_ANGLE; // har segment boshi
+    var px1 = CX + pegR * Math.cos(pegA);
+    var py1 = CY + pegR * Math.sin(pegA);
+    var px2 = CX + (pegR + pegLen) * Math.cos(pegA);
+    var py2 = CY + (pegR + pegLen) * Math.sin(pegA);
+    // Mix soyasi
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetX = 1; ctx.shadowOffsetY = 1;
+    // Mix tanasi — metall gradient
+    ctx.beginPath();
+    ctx.moveTo(px1, py1);
+    ctx.lineTo(px2, py2);
+    ctx.strokeStyle = '#8aacbe';
+    ctx.lineWidth = pegW;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    // Mix parlaq qismi
+    ctx.beginPath();
+    ctx.moveTo(px1, py1);
+    ctx.lineTo(
+      px1 + (px2-px1)*0.6 + Math.sin(pegA)*1.5,
+      py1 + (py2-py1)*0.6 - Math.cos(pegA)*1.5
+    );
+    ctx.strokeStyle = 'rgba(220,240,255,0.7)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    // Mix boshi (yumaloq to'p)
+    ctx.beginPath();
+    ctx.arc(px2, py2, pegW * 0.7, 0, 2 * Math.PI);
+    ctx.fillStyle = '#aaccdd';
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Outer decorative ring (rasmga o'xshash metall chegara)
+  ctx.beginPath();
+  ctx.arc(CX, CY, R + 2, 0, 2 * Math.PI);
+  ctx.strokeStyle = '#5a7a8a';
+  ctx.lineWidth = 5;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(CX, CY, R + 6, 0, 2 * Math.PI);
+  ctx.strokeStyle = 'rgba(200,220,230,0.5)';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  // Inner circle (1XLIVE logo joyi)
+  ctx.beginPath();  ctx.arc(CX, CY, 90, 0, 2 * Math.PI);
+  var cGrd = ctx.createRadialGradient(CX-14, CY-14, 6, CX, CY, 90);
+  cGrd.addColorStop(0, '#e8f4f8');
+  cGrd.addColorStop(1, '#a0c0d0');
+  ctx.fillStyle = cGrd;
+  ctx.fill();
+  ctx.strokeStyle = '#6a9aaa';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+}
+
+// =============================================
+// CANVAS POINTER — ip kabi egiluvchi strelka
+// =============================================
+var lineCanvas = document.getElementById('lineCanvas');
+var lctx = lineCanvas.getContext('2d');
+var LCX = lineCanvas.width / 2;  // 340
+
+// Pointer holati — spring fizikasi
+var pointerBendTarget = 0; // maqsad burchak (radian)
+var currentBend = 0;       // hozirgi burchak
+var bendVelocity = 0;      // burchak tezligi
+var pointerAnimId = null;
+var SPRING_K    = 0.10;
+var SPRING_DAMP = 0.22;
+
+function drawPointer(bendAngle) {
+  lctx.clearRect(0, 0, lineCanvas.width, lineCanvas.height);
+
+  // Pivot (to'p osilib turgan nuqta) — lineCanvas tepasi, g'ildirak ustida
+  // lineCanvas: top=-40px => g'ildirak markazi canvas Y = 340+40 = 380
+  // Mix tubi (peg root, R+8=328): canvas Y = 380-328 = 52
+  // Pointer uzunligi: pivotY(18) -> tipY(52) = 34px, +6px ichkari = 40px
+  var pivotX   = LCX;   // 340 (markaz)
+  var pivotY   = 18;    // to'p markazi Y
+  var pointerLen = 40;  // ip uzunligi (px, canvas koordinatasi)
+  // Tip koordinatasi: pivot atrofida aylanma harakat
+  // bendAngle=0 => to'g'ri pastga; bendAngle>0 => o'ngga og'adi
+  var tipX = pivotX + pointerLen * Math.sin(bendAngle);
+  var tipY = pivotY + pointerLen * Math.cos(bendAngle);
+
+  // Ip egriligi uchun control point — o'rtada, bir oz og'ish tomonga
+  var cpX = pivotX + (tipX - pivotX) * 0.35 + Math.sin(bendAngle) * 8;
+  var cpY = pivotY + (tipY - pivotY) * 0.55;
+
+  // === IP TANASI ===
+  lctx.save();
+  lctx.shadowColor = 'rgba(0,0,0,0.5)';
+  lctx.shadowBlur  = 6;
+  lctx.shadowOffsetX = 2;
+  lctx.shadowOffsetY = 3;
+
+  lctx.beginPath();
+  lctx.moveTo(pivotX, pivotY + 14); // to'p pastidan
+  lctx.quadraticCurveTo(cpX, cpY, tipX, tipY);
+  lctx.strokeStyle = '#8B0000';
+  lctx.lineWidth   = 6;
+  lctx.lineCap     = 'round';
+  lctx.stroke();
+  lctx.restore();
+
+  // === HIGHLIGHT ===
+  lctx.beginPath();
+  lctx.moveTo(pivotX - 1, pivotY + 14);
+  lctx.quadraticCurveTo(cpX - 1, cpY - 1, tipX - 1, tipY - 1);
+  lctx.strokeStyle = 'rgba(255,90,90,0.38)';
+  lctx.lineWidth   = 2.5;
+  lctx.lineCap     = 'round';
+  lctx.stroke();
+
+  // === UCHI — kichik uchburchak ===
+  var dx = tipX - cpX;
+  var dy = tipY - cpY;
+  var tipAng = Math.atan2(dy, dx);
+  lctx.save();
+  lctx.translate(tipX, tipY);
+  lctx.rotate(tipAng + Math.PI / 2);
+  lctx.beginPath();
+  lctx.moveTo(0, 4);
+  lctx.lineTo(-5, -10);
+  lctx.lineTo(5, -10);
+  lctx.closePath();
+  lctx.fillStyle = '#550000';
+  lctx.fill();
+  lctx.restore();
+
+  // === PIVOT TO'P ===
+  lctx.save();
+  lctx.shadowColor = 'rgba(0,0,0,0.55)';
+  lctx.shadowBlur  = 10;
+  var bGrd = lctx.createRadialGradient(pivotX - 4, pivotY - 4, 2, pivotX, pivotY, 13);
+  bGrd.addColorStop(0, '#ff9999');
+  bGrd.addColorStop(0.4, '#cc1111');
+  bGrd.addColorStop(1,   '#660000');
+  lctx.beginPath();
+  lctx.arc(pivotX, pivotY, 13, 0, Math.PI * 2);
+  lctx.fillStyle = bGrd;
+  lctx.fill();
+  lctx.beginPath();
+  lctx.arc(pivotX - 4, pivotY - 4, 4, 0, Math.PI * 2);
+  lctx.fillStyle = 'rgba(255,210,210,0.5)';
+  lctx.fill();
+  lctx.strokeStyle = 'rgba(255,160,160,0.5)';
+  lctx.lineWidth = 1.5;
+  lctx.beginPath();
+  lctx.arc(pivotX, pivotY, 13, 0, Math.PI * 2);
+  lctx.stroke();
+  lctx.restore();
+}
+
+// Boshlang'ich holat
+drawPointer(0);
+
+// Spring fizikasi bilan pointer animatsiyasi (spin tugagandan keyin)
+function animatePointer() {
+  // Spin tugagandan keyin ham sustroq spring — chiroyli tebranish
+  var force = -SPRING_K * (currentBend - pointerBendTarget) - SPRING_DAMP * bendVelocity;
+  bendVelocity += force;
+  currentBend  += bendVelocity;
+
+  drawPointer(currentBend);
+
+  var settled = Math.abs(currentBend - pointerBendTarget) < 0.003 && Math.abs(bendVelocity) < 0.003;
+  if (!isSpinning && !settled) {
+    pointerAnimId = requestAnimationFrame(animatePointer);
+  } else if (!isSpinning) {
+    currentBend = pointerBendTarget;
+    bendVelocity = 0;
+    drawPointer(currentBend);
+    pointerAnimId = null;
+  }
+}
+
+function setPointerBend(targetPx) {
+  pointerBendTarget = targetPx;
+  if (!isSpinning && !pointerAnimId) {
+    pointerAnimId = requestAnimationFrame(animatePointer);
+  }
+}
+
+drawWheel(currentAngle);
+
+// =============================================
+// AUDIO — tick ovozi (Web Audio API)
+// =============================================
+var audioCtx = null;
+function playTick(speed) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    var o = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    o.connect(g);
+    g.connect(audioCtx.destination);
+    // Tezlik oshsa — tovush balandroq va qisqaroq
+    var vol = Math.min(0.18, 0.06 + speed * 0.004);
+    o.frequency.value = 420 + Math.random() * 120;
+    o.type = 'triangle';
+    g.gain.setValueAtTime(vol, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.055);
+    o.start(audioCtx.currentTime);
+    o.stop(audioCtx.currentTime + 0.055);
+  } catch(e) {}
+}
+
+// =============================================
+// GAME LOGIC
+// =============================================
+function selectFish(type) {
+  selectedFish = type;
+  document.querySelectorAll('.fish-btn').forEach(function(b) { b.classList.remove('selected'); });
+  document.getElementById('btn-' + type).classList.add('selected');
+}
+
+function changeBet(delta) {
+  var input = document.getElementById('betInput');
+  var val = parseInt(input.value) || 100;
+  val = Math.max(10, Math.min(balance, val + delta));
+  input.value = val;
+}
+
+function getWinningSegment(finalAngle) {
+  var pointerAngle = -Math.PI / 2;
+  var normalized = ((pointerAngle - finalAngle) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+  var idx = Math.floor(normalized / SEG_ANGLE) % TOTAL;
+  return { seg: SEGMENTS[idx], idx: idx };
+}
+
+// Pointer elementini olish
+var lastTickIdx = -1;
+var tickTimeout = null;
+
+function triggerPointerTick(speed) {
+  triggerPointerTickCustom(speed, 1.0, 120);
+}
+
+function triggerPointerTickCustom(speed, bendMult, returnDelay) {
+  // Burchak og'ish: tezlikka qarab 0.15 - 0.55 radian (≈ 9° - 32°)
+  var bendAngle = Math.max(0.15, Math.min(0.55, 0.15 + speed * 0.012)) * bendMult;
+  setPointerBend(bendAngle);
+  if (tickTimeout) clearTimeout(tickTimeout);
+  tickTimeout = setTimeout(function() {
+    setPointerBend(0);
+  }, returnDelay);
+}
+
+function getPointerSegIdx(angle) {
+  var pointerAngle = -Math.PI / 2;
+  var normalized = ((pointerAngle - angle) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+  return Math.floor(normalized / SEG_ANGLE) % TOTAL;
+}
+
+function spin() {
+  if (isSpinning) return;
+
+  isSpinning = true;
+  lastTickIdx = -1;
+  document.getElementById('spinBtn').disabled = true;
+
+  var targetIdx = Math.floor(Math.random() * TOTAL);
+  var extraSpins = (6 + Math.floor(Math.random() * 4)) * 2 * Math.PI;
+  var targetAngle = -Math.PI / 2 - (targetIdx + 0.5) * SEG_ANGLE;
+  var finalAngle = targetAngle;
+  while (finalAngle < currentAngle + Math.PI) finalAngle += 2 * Math.PI;
+  finalAngle += extraSpins;
+  var startAngle = currentAngle;
+  var startTime = null;
+  var duration = 7000 + Math.random() * 2000; // uzunroq spin
+  var totalDelta = finalAngle - startAngle;
+
+  function easeOut(t) {
+    // Oxirida juda sekin to'xtaydi: cubic + yana bir daraja
+    var t1 = 1 - Math.pow(1 - t, 6);
+    return t1;
+  }
+
+  function animate(ts) {
+    if (!startTime) startTime = ts;
+    var elapsed = ts - startTime;
+    var progress = Math.min(elapsed / duration, 1);
+    var eased = easeOut(progress);
+    currentAngle = startAngle + totalDelta * eased;
+    drawWheel(currentAngle);
+
+    // === POINTER TICK DETEKSIYASI ===
+    var curIdx = getPointerSegIdx(currentAngle);
+    if (curIdx !== lastTickIdx) {
+      // Tezlikni derivative bilan aniqroq hisoblash
+      var speed = Math.abs(totalDelta) * 6 * Math.pow(1 - progress, 5) / duration * 1000;
+      var absSpeed = speed;
+
+      // Oxirida (progress > 0.75) juda sekin — ip ko'proq egilsin va sekin qaytsin
+      var bendMult = progress > 0.75 ? 1.8 : 1.0;
+      var returnDelay = progress > 0.75 ? 350 : 120;
+
+      triggerPointerTickCustom(absSpeed, bendMult, returnDelay);
+      playTick(absSpeed);
+      lastTickIdx = curIdx;
+    }    // Spin davomida pointer spring fizikasi bilan yangilaymiz
+    // Oxirida spring sustroq — ko'proq tebranib, sekinroq qaytadi
+    var springK    = progress > 0.75 ? 0.06 : 0.10;
+    var springDamp = progress > 0.75 ? 0.14 : 0.22;
+    var force = -springK * (currentBend - pointerBendTarget) - springDamp * bendVelocity;
+    bendVelocity += force;
+    currentBend  += bendVelocity;
+    drawPointer(currentBend);
+
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      var mod = finalAngle % (2 * Math.PI);
+      currentAngle = mod < 0 ? mod + 2 * Math.PI : mod;
+      drawWheel(currentAngle);
+      isSpinning = false;
+      // Pointer markazga silliq qaytsin
+      setPointerBend(0);
+      document.getElementById('spinBtn').disabled = false;
+      var result = getWinningSegment(currentAngle);
+      setTimeout(function() { showResult(result.seg); }, 300);
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+function showResult(seg) {
+  addLastResult(seg);
+
+  var overlay = document.getElementById('resultOverlay');
+  var iconEl = document.getElementById('resultIcon');
+  var fishEl = document.getElementById('resultFish');
+  var winEl  = document.getElementById('resultWin');
+
+  var icons  = { white: '❄️', silver: '◆', blue: '🐟', orange: '🐠', red: '🎣' };
+  var names  = { white: 'OQ', silver: 'KUMUSH', blue: "LIL' BLUES", orange: 'BIG ORANGES', red: 'HUGE REDS' };
+  var colors = { white: '#aaccee', silver: '#5aaabb', blue: '#5aaee8', orange: '#e8a83a', red: '#e74c3c' };
+
+  iconEl.textContent = icons[seg.type] || '⬜';
+  fishEl.textContent = names[seg.type] || seg.type.toUpperCase();
+  fishEl.style.color = colors[seg.type] || '#fff';
+  winEl.textContent  = '';
+  winEl.className    = 'result-win';
+
+  overlay.classList.add('show');
+}
+
+function closeResult() {
+  document.getElementById('resultOverlay').classList.remove('show');
+}
+
+function addLastResult(seg) {
+  lastResults.unshift(seg);
+  if (lastResults.length > 12) lastResults.pop();
+  var colors = { white: '#ddeeff', silver: '#4a6a80', blue: '#3a7fc1', orange: '#d4881a', red: '#c02020' };
+  var icons = { white: '❄', silver: '◆', blue: '🐟', orange: '🐠', red: '🎣' };
+  var el = document.getElementById('lastResults');
+  el.innerHTML = lastResults.map(function(s) {
+    return '<div class="last-dot" style="background:' + colors[s.type] + ';border-color:' + (s.borderColor || '#fff5') + '">' + (icons[s.type] || '') + '</div>';
+  }).join('');
+}
+
+function updateBalance() {
+  // balance tizimi olib tashlandi — bu funksiya bo'sh qoldi
+}
+</script>
+</body>
+</html>
